@@ -3,18 +3,10 @@
 <html>
 
 <head>
-    <title>Example 04.09 - Koch2 - SierpinskiGasket - Mar.22</title>
+    <title>Pyramid Fractals</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/91/three.min.js"></script>
-    <!-- <script src="../learning-threejs/libs/three.js"> </script> -->
-    
     <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
-    <!-- <script src="orbitcontrols.js"></script> -->
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js"></script>
-    <!-- <script src="../learning-threejs/libs/stats.js"> </script> -->
-
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.1/dat.gui.min.js"></script> -->
-    <!-- <script src="../learning-threejs/libs/dat.GUI.js"> </script> -->
     <style>
         body {
             margin: 0;
@@ -27,16 +19,13 @@
 
     <div id="Stats-output">
     </div>
-    <!-- Div which will hold the Output -->
     <div id="WebGL-output">
     </div>
 
-    <!-- Javascript code that runs our Three.js examples -->
     <script type="text/javascript">
-        var scene = new THREE.Scene();
+        const scene = new THREE.Scene();
 
         function getPyramid(v0, v1, v2, v3, v4) {
-            //Mar.22 - Custom Geometry - a tetrahedron
             let vertices = [v0, v1, v2, v3, v4];
             let faces = [
                 new THREE.Face3(0, 2, 1),  //F_0 - swap indexes
@@ -56,7 +45,7 @@
             return pyramidMesh;
         }
         
-        function drawSomething(v0, v1, v2, v3, v4, n) {
+        function drawFractalizedPyramid(v0, v1, v2, v3, v4, n) {
             if (n <= 1) {
                 scene.add(getPyramid(v0, v1, v2, v3, v4));
                 return;
@@ -72,13 +61,11 @@
                 let v34 = v3.clone().lerp(v4, 0.5);
                 let v1203 = v12.clone().lerp(v03, 0.5);
                 let v2301 = v23.clone().lerp(v01, 0.5);
-
-                //drawSomething(v0, v1, v2, v3, v4, 5);
-                drawSomething(v0, v01, v1203, v03, v04, n - 1);
-                drawSomething(v01, v1, v12, v1203, v14, n - 1);
-                drawSomething(v1203, v12, v2, v23, v24, n - 1);
-                drawSomething(v03, v1203, v23, v3, v34, n - 1);
-                drawSomething(v04, v14, v24, v34, v4, n - 1);                
+                drawFractalizedPyramid(v0, v01, v1203, v03, v04, n - 1);
+                drawFractalizedPyramid(v01, v1, v12, v1203, v14, n - 1);
+                drawFractalizedPyramid(v1203, v12, v2, v23, v24, n - 1);
+                drawFractalizedPyramid(v03, v1203, v23, v3, v34, n - 1);
+                drawFractalizedPyramid(v04, v14, v24, v34, v4, n - 1);                
             }
         }
 
@@ -157,7 +144,7 @@
 
             let pyramids = [pyramid1, pyramid2, pyramid3, pyramid4 , pyramid5];
             pyramids.forEach(p => {
-                drawSomething(p.v0, p.v1, p.v2, p.v3, p.v4, 5);
+                drawFractalizedPyramid(p.v0, p.v1, p.v2, p.v3, p.v4, 5);
             });
             document.getElementById("WebGL-output").appendChild(renderer.domElement);
             let step = 0;
@@ -175,27 +162,18 @@
                 renderer.render(scene, camera);
             }
 
-
             function initStats() {
-
                 const stats = new Stats();
-
                 stats.setMode(0); // 0: fps, 1: ms
-
-                // Align top-left
                 stats.domElement.style.position = 'absolute';
                 stats.domElement.style.left = '0px';
                 stats.domElement.style.top = '0px';
-
                 document.getElementById("Stats-output").appendChild(stats.domElement);
-
                 return stats;
             }
         };
 
         window.onload = init;
-
-
     </script>
 </body>
 
