@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>Example 04.09 - Koch2 - SierpinskiGasket - Mar.22</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/91/three.min.js"></script>
+    <!-- <script src="../learning-threejs/libs/three.js"> </script> -->
+    
+    <script src="https://threejs.org/examples/js/controls/OrbitControls.js"></script>
+    <!-- <script src="orbitcontrols.js"></script> -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stats.js/r16/Stats.min.js"></script>
+    <!-- <script src="../learning-threejs/libs/stats.js"> </script> -->
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.1/dat.gui.min.js"></script> -->
+    <!-- <script src="../learning-threejs/libs/dat.GUI.js"> </script> -->
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="Stats-output">
+    </div>
+    <!-- Div which will hold the Output -->
+    <div id="WebGL-output">
+    </div>
+
+    <!-- Javascript code that runs our Three.js examples -->
+    <script type="text/javascript">
+        var scene = new THREE.Scene();
+
+        function getPyramid(v0, v1, v2, v3, v4) {
+            //Mar.22 - Custom Geometry - a tetrahedron
+            let vertices = [v0, v1, v2, v3, v4];
+            let faces = [
+                new THREE.Face3(0, 2, 1),  //F_0 - swap indexes
+                new THREE.Face3(0, 3, 2),  //F_1  
+                new THREE.Face3(0, 4, 1),  //F_2  
+                new THREE.Face3(1, 4, 2),  //F_3  
+                new THREE.Face3(2, 4, 3),  //F_3  
+                new THREE.Face3(3, 4, 0),  //F_3  
+            ];
+            let pyramidGeo = new THREE.Geometry();
+            pyramidGeo.vertices = vertices;
+            pyramidGeo.faces = faces;
+            pyramidGeo.computeFaceNormals();
+            let pyramidMat = new THREE.MeshLambertMaterial({ color: (()=>{return(Math.random()*0xFFFFFF<<1);})() });
+            pyramidMat.side = THREE.DoubleSide;
+            let pyramidMesh = new THREE.Mesh(pyramidGeo, pyramidMat);
+            return pyramidMesh;
+        }
+        
+        function drawSomething(v0, v1, v2, v3, v4, n) {
+            if (n <= 1) {
+                scene.add(getPyramid(v0, v1, v2, v3, v4));
+                return;
+            } else {
+                //find mid points of the six sides of the pyramid
+                let v01 = v0.clone().lerp(v1, 0.5);
+                let v12 = v1.clone().lerp(v2, 0.5);
+                let v23 = v2.clone().lerp(v3, 0.5);
+                let v03 = v0.clone().lerp(v3, 0.5);
+                let v04 = v0.clone().lerp(v4, 0.5);
+                let v14 = v1.clone().lerp(v4, 0.5);
+                let v24 = v2.clone().lerp(v4, 0.5);
+                let v34 = v3.clone().lerp(v4, 0.5);
+                let v1203 = v12.clone().lerp(v03, 0.5);
+                let v2301 = v23.clone().lerp(v01, 0.5);
+
+                //drawSomething(v0, v1, v2, v3, v4, 5);
+                drawSomething(v0, v01, v1203, v03, v04, n - 1);
+                drawSomething(v01, v1, v12, v1203, v14, n - 1);
+                drawSomething(v1203, v12, v2, v23, v24, n - 1);
+                drawSomething(v03, v1203, v23, v3, v34, n - 1);
+                drawSomething(v04, v14, v24, v34, v4, n - 1);                
+            }
+        }
+
+        function init() {
+            let stats = initStats();
+            let camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+            let renderer = new THREE.WebGLRenderer();
+            renderer.setClearColor(0x333333, 0.3);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMapEnabled = true;
+            camera.position.x = -30;
+            camera.position.y = 40;
+            camera.position.z = 30;
+            camera.lookAt(scene.position);
+            camera.position.y = 40;
+            let controls = new THREE.OrbitControls(camera);
+            let axes = new THREE.AxisHelper(30);
+            scene.add(axes);
+            let ambientLight = new THREE.AmbientLight(0x444444);
+            scene.add(ambientLight);
+
+            let groundGeom = new THREE.PlaneBufferGeometry(50, 50, 4, 4);
+            let groundMesh = new THREE.Mesh(groundGeom, new THREE.MeshPhongMaterial({color: 0x999999}));
+            groundMesh.rotation.x = -Math.PI / 2;
+            groundMesh.position.y = 0;
+            scene.add(groundMesh);
+
+            let spotLight = new THREE.SpotLight(0xffffff);
+            spotLight.position.set(-40, 60, -10);
+            spotLight.castShadow = true;
+            scene.add(spotLight);
+
+            // Axis Labels
+            // Blue: Z
+            // Yellow: Y
+            // Red: X
+            let pyramid1 = {
+                v0: new THREE.Vector3(0, 0, 0),
+                v1: new THREE.Vector3(20, 0, 0),
+                v2: new THREE.Vector3(20, 0, 20),
+                v3: new THREE.Vector3(0, 0, 20),
+                v4: new THREE.Vector3(10, 10, 10)
+            };
+
+            let pyramid2 = {
+                v0: new THREE.Vector3(0, 0, 0),
+                v1: new THREE.Vector3(-20, 0, 0),
+                v2: new THREE.Vector3(-20, 0, 20),
+                v3: new THREE.Vector3(0, 0, 20),
+                v4: new THREE.Vector3(-10, 10, 10)
+            };
+
+            let pyramid3 = {
+                v0: new THREE.Vector3(0, 0, 0),
+                v1: new THREE.Vector3(-20, 0, 0),
+                v2: new THREE.Vector3(-20, 0, -20),
+                v3: new THREE.Vector3(0, 0, -20),
+                v4: new THREE.Vector3(-10, 10, -10)
+            };
+
+            let pyramid4 = {
+                v0: new THREE.Vector3(0, 0, 0),
+                v1: new THREE.Vector3(20, 0, 0),
+                v2: new THREE.Vector3(20, 0, -20),
+                v3: new THREE.Vector3(0, 0, -20),
+                v4: new THREE.Vector3(10, 10, -10)
+            };
+
+            let pyramid5 = {
+                v0: new THREE.Vector3(10, 20, 10),
+                v1: new THREE.Vector3(-10, 20, 10),
+                v2: new THREE.Vector3(-10, 20, -10),
+                v3: new THREE.Vector3(10, 20, -10),
+                v4: new THREE.Vector3(0, 10, 0)
+            };
+
+            let pyramids = [pyramid1, pyramid2, pyramid3, pyramid4 , pyramid5];
+            pyramids.forEach(p => {
+                drawSomething(p.v0, p.v1, p.v2, p.v3, p.v4, 5);
+            });
+            document.getElementById("WebGL-output").appendChild(renderer.domElement);
+            let step = 0;
+            render();
+
+            function render() {
+                stats.update();
+                controls.update();
+                //lineMesh.rotation.z = step += 0.01;
+                //scene.rotation.y = step += 0.01;
+                //scene.rotation.x = step += 0.005;
+                //scene.rotation.z = step += 0.01;
+                
+                requestAnimationFrame(render);
+                renderer.render(scene, camera);
+            }
+
+
+            function initStats() {
+
+                const stats = new Stats();
+
+                stats.setMode(0); // 0: fps, 1: ms
+
+                // Align top-left
+                stats.domElement.style.position = 'absolute';
+                stats.domElement.style.left = '0px';
+                stats.domElement.style.top = '0px';
+
+                document.getElementById("Stats-output").appendChild(stats.domElement);
+
+                return stats;
+            }
+        };
+
+        window.onload = init;
+
+
+    </script>
+</body>
+
+</html>
