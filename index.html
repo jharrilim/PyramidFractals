@@ -81,7 +81,7 @@
             camera.position.z = 30;
             camera.lookAt(scene.position);
             camera.position.y = 40;
-            let controls = new THREE.OrbitControls(camera);
+            let controls = new THREE.OrbitControls(camera, renderer.domElement);
             let axes = new THREE.AxisHelper(30);
             scene.add(axes);
             let ambientLight = new THREE.AmbientLight(0x444444);
