@@ -26,22 +26,22 @@
         const scene = new THREE.Scene();
 
         function getPyramid(v0, v1, v2, v3, v4) {
-            let vertices = [v0, v1, v2, v3, v4];
-            let faces = [
-                new THREE.Face3(0, 2, 1),  //F_0 - swap indexes
-                new THREE.Face3(0, 3, 2),  //F_1  
-                new THREE.Face3(0, 4, 1),  //F_2  
-                new THREE.Face3(1, 4, 2),  //F_3  
-                new THREE.Face3(2, 4, 3),  //F_3  
-                new THREE.Face3(3, 4, 0),  //F_3  
+            const vertices = [v0, v1, v2, v3, v4];
+            const faces = [
+                { a: 0, b: 2, c: 1 },  //F_0 - swap indexes
+                { a: 0, b: 3, c: 2 },  //F_1  
+                { a: 0, b: 4, c: 1 },  //F_2  
+                { a: 1, b: 4, c: 2 },  //F_3  
+                { a: 2, b: 4, c: 3 },  //F_3  
+                { a: 3, b: 4, c: 0 },  //F_3  
             ];
-            let pyramidGeo = new THREE.Geometry();
+            const pyramidGeo = new THREE.Geometry();
             pyramidGeo.vertices = vertices;
             pyramidGeo.faces = faces;
             pyramidGeo.computeFaceNormals();
-            let pyramidMat = new THREE.MeshLambertMaterial({ color: (()=>{return(Math.random()*0xFFFFFF<<1);})() });
+            const pyramidMat = new THREE.MeshLambertMaterial({ color: (()=>{return(Math.random()*0xFFFFFF<<1);})() });
             pyramidMat.side = THREE.DoubleSide;
-            let pyramidMesh = new THREE.Mesh(pyramidGeo, pyramidMat);
+            const pyramidMesh = new THREE.Mesh(pyramidGeo, pyramidMat);
             return pyramidMesh;
         }
         
